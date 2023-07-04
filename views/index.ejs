@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="main.css" />
+  </head>
+  <body>
+    <main>
+      <section>
+        <div>
+          <div
+            style="width: 100%"
+            class="d-flex align-items-center justify-content-between"
+          >
+            <div
+              style="height: 100vh; overflow-y: auto"
+              class="users-box col-4 p-3"
+              id="users"
+            ></div>
+            <div
+              style="height: 100vh"
+              class="col-8 d-flex flex-column align-items-end"
+            >
+              <div
+                style="overflow-y: auto"
+                class="messages-box w-100 p-3"
+                id="main_messages"
+              ></div>
+              <form
+                class="w-100 mt-auto p-3 d-flex align-items-center"
+                style="background-color: #21364b"
+                id="form"
+              >
+                <label class="me-3" style="cursor: pointer">
+                  <img src="file-upload.png" alt="upload" />
+                  <input class="d-none" type="file" id="file" />
+                </label>
+                <input type="text" placeholder="Send message..." id="msg" />
+                <button class="btn btn-primary send"></button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+      const userId = localStorage.getItem('user_id');
+      const socket = io.connect('/', { query: `userId=${userId}` });
+      const localData = localStorage.getItem('token');
+
+      if (!localData) {
+        location.replace('signup');
+      }
+
+      form.addEventListener('submit', (evt) => {
+        evt.preventDefault();
+        if (msg.value.trim()) {
+          const date = new Date();
+          socket.emit('msg', {
+            msg: msg.value.trim(),
+            user: localStorage.getItem('user'),
+            time: date.getHours() + ':' + date.getMinutes(),
+            user_img: localStorage.getItem('user_img'),
+          });
+
+          msg.value = '';
+        } else {
+          msg.value = '';
+        }
+      });
+
+      file.onchange = () => {
+        const formData = new FormData();
+
+        if (
+          file.files[0].type != 'image/jpeg' &&
+          file.files[0].type != 'image/png' &&
+          file.files[0].type != 'image/svg' &&
+          file.files[0].type != 'image/webp'
+        ) {
+          msg.classList.add('text-danger');
+          msg.value = 'Max size file 20MB!!!';
+        } else {
+          const date = new Date();
+          msg.classList.remove('text-danger');
+          msg.value = '';
+          formData.append('img_msg', file.files[0]);
+          formData.append('user', localStorage.getItem('user'));
+          formData.append('time', date.getHours() + ':' + date.getMinutes());
+          formData.append('user_img', localStorage.getItem('user_img'));
+
+          fetch('http://localhost:9000/img_msg', {
+            method: 'POST',
+            body: formData,
+          })
+            .then((res) => res.json())
+            .then((data) => console.log(data));
+        }
+
+        const getImgMsg = () => {
+          fetch('http://localhost:9000/img_msg')
+            .then((res) => res.json())
+            .then((data) => {
+              if (data.status == 200) {
+                main_messages.innerHTML = '';
+                data.data.map((item) => {
+                  main_messages.innerHTML += `
+                <div style="
+                    margin-left: ${
+                      item.user == localStorage.getItem('user') ? 'auto' : ''
+                    };
+                    margin-right: ${
+                      item.user != localStorage.getItem('user') ? 'auto' : 0
+                    };
+                    max-width: 400px;
+                    flex-direction: ${
+                      item.user == localStorage.getItem('user')
+                        ? ''
+                        : 'row-reverse'
+                    };
+                    "
+                    class="d-flex justify-content-end align-items-end mb-3">
+
+                  <div style="max-width: 350px; min-width: 120px;
+                    border-top-right-radius: 30px;
+                    border-top-left-radius: 30px;
+                    border-bottom-left-radius: ${
+                      item.user == localStorage.getItem('user') ? '30px' : 0
+                    };
+                    border-bottom-right-radius: ${
+                      item.user != localStorage.getItem('user') ? '30px' : 0
+                    };
+                    background-color: ${
+                      item.user == localStorage.getItem('user')
+                        ? '#2B5278'
+                        : '#182533'
+                    };
+                    " class="d-block mb-3 py-2 ${item.img_msg ? '' : 'px-3'}">
+                      <span class="text-end d-block mb-3 ${
+                        item.img_msg ? 'me-3' : ''
+                      } ${
+                    item.user == localStorage.getItem('user')
+                      ? 'text-dark'
+                      : 'text-light'
+                  }" id="user_name">${item.user}</span>
+                      <div class="d-flex justify-content-between align-items-end flex-wrap">
+                       
+                        ${
+                          item.img_msg
+                            ? `<div class="bg-secondary bg-opacity-50" style="width: 100%; max-width: 400px; height: auto">
+                                <img class="d-block" style="width: 100%; max-width: 400px; height: auto" src="${
+                                  item?.img_msg ?? ''
+                                }" alt="There should have been a picture here, but there was an error!" />
+                              </div>`
+                            : ``
+                        }
+                        <span class="text-start ${
+                          item.img_msg ? 'd-none' : ''
+                        } me-3 text-white" id="message">
+                          ${item?.message}
+                        </span>
+                        <span style="font-size: 14px" class="${
+                          item.img_msg ? 'd-block' : ''
+                        } text-end text-white ${
+                    item.img_msg ? 'd-block ms-auto me-3 mt-3' : ''
+                  } text-opacity-50">${item.time}</span>
+                      </div>
+                  </div>
+                  <img class="${
+                    item.user == localStorage.getItem('user') ? 'ms-2' : 'me-2'
+                  } rounded-2" width="35" height="35" src="${item.user_img}" />
+                </div>
+                `;
+                  if (main_messages.scrollHeight > main_messages.clientHeight) {
+                    main_messages.scrollTop =
+                      main_messages.scrollHeight - main_messages.clientHeight;
+                  }
+                });
+              }
+            });
+        };
+
+        getImgMsg();
+      };
+
+      socket.on('message', (chunk) => {
+        if (chunk) {
+          main_messages.innerHTML = '';
+
+          chunk.map((item) => {
+            const date = new Date();
+
+            main_messages.innerHTML += `
+                <div style="
+                    margin-left: ${
+                      item.user == localStorage.getItem('user') ? 'auto' : ''
+                    };
+                    margin-right: ${
+                      item.user != localStorage.getItem('user') ? 'auto' : 0
+                    };
+                    max-width: 400px;
+                    flex-direction: ${
+                      item.user == localStorage.getItem('user')
+                        ? ''
+                        : 'row-reverse'
+                    };
+                    "
+                    class="d-flex justify-content-end align-items-end mb-3">
+
+                  <div style="max-width: 350px; min-width: 120px;
+                    border-top-right-radius: 30px;
+                    border-top-left-radius: 30px;
+                    border-bottom-left-radius: ${
+                      item.user == localStorage.getItem('user') ? '30px' : 0
+                    };
+                    border-bottom-right-radius: ${
+                      item.user != localStorage.getItem('user') ? '30px' : 0
+                    };
+                    background-color: ${
+                      item.user == localStorage.getItem('user')
+                        ? '#2B5278'
+                        : '#182533'
+                    };
+                    " class="d-block mb-3 py-2 ${item.img_msg ? '' : 'px-3'}">
+                      <span class="text-end d-block mb-3 ${
+                        item.img_msg ? 'me-3' : ''
+                      } ${
+              item.user == localStorage.getItem('user')
+                ? 'text-dark'
+                : 'text-light'
+            }" id="user_name">${item.user}</span>
+                      <div class="d-flex justify-content-between align-items-end flex-wrap">
+                        ${
+                          item.img_msg
+                            ? `<div class="bg-secondary bg-opacity-50" style="width: 100%; max-width: 400px; height: auto">
+                                <img class="d-block" style="width: 100%; max-width: 400px; height: auto" src="${
+                                  item?.img_msg ?? ''
+                                }" alt="There should have been a picture here, but there was an error!" />
+                              </div>`
+                            : ``
+                        }
+                        <span class="text-start ${
+                          item.img_msg ? 'd-none' : ''
+                        } me-3 text-white" id="message">
+                          ${item?.message}
+                        </span>
+                        <span style="font-size: 14px" class="${
+                          item.img_msg ? 'd-block' : ''
+                        } text-end text-white ${
+              item.img_msg ? 'd-block ms-auto me-3 mt-3' : ''
+            } text-opacity-50">${item.time}</span>
+                      </div>
+                  </div>
+                  <img class="${
+                    item.user == localStorage.getItem('user') ? 'ms-2' : 'me-2'
+                  } rounded-2" width="35" height="35" src="${item.user_img}" />
+                </div>
+                `;
+            if (main_messages.scrollHeight > main_messages.clientHeight) {
+              main_messages.scrollTop =
+                main_messages.scrollHeight - main_messages.clientHeight;
+            }
+          });
+        }
+      });
+
+      socket.on('users', (chunk) => {
+        users.innerHTML = '';
+        if (chunk) {
+          chunk.map((item) => {
+            const lastOnline = item.lastOnline
+              ? new Date(item.lastOnline)
+              : new Date();
+            const options = {
+              hour: 'numeric',
+              minute: 'numeric',
+            };
+            const timeFormatter = new Intl.DateTimeFormat('en-US', options);
+            const formattedTime = timeFormatter.format(lastOnline);
+
+            return (users.innerHTML += `
+                  <div
+                   class="d-flex align-items-center p-2 bg-secondary rounded-2 bg-opacity-25 mb-2">
+                    <img class="rounded-circle" width="70" height="70" src="${item.images.map(
+                      (image) => image.img_name
+                    )}" alt="${item.user_name}">
+                    <div class="ms-4">
+                      <h3 class="text-light">${item.user_name}</h3>
+
+                   <h5 class=" m-0  ${
+                     item.isOnline
+                       ? `text-success" >Online`
+                       : `text-danger" >Last online  ${formattedTime}`
+                   }</h5>
+                    </div>
+                  </div>
+              `);
+          });
+        }
+      });
+
+      const getUser = () => {
+        fetch('http://192.168.100.207:9000/register', {
+          method: 'GET',
+          headers: {
+            Authorization: localData,
+          },
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.status == 200) {
+              data.data.map((item) => {
+                localStorage.setItem('user', item.user_name);
+                localStorage.setItem('user_id', item.id);
+                item.images.map((item) => {
+                  localStorage.setItem('user_img', item.img_name);
+                });
+              });
+            }
+            if (data.message == 'jwt expired') {
+              location.replace('/signup');
+            }
+          })
+          .catch((err) => console.log(err));
+      };
+
+      getUser();
+
+      const logout = () => {
+        localStorage.removeItem('token');
+        location.replace('/signin');
+      };
+    </script>
+  </body>
+</html>

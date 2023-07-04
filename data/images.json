@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "img_name": "/c7c6d7a7cf2bba81aaac05e42216f9fdme.png",
+    "size": 470739,
+    "type": "image/png",
+    "link": "/download/c7c6d7a7cf2bba81aaac05e42216f9fdme.png",
+    "user_id": 1
+  },
+  {
+    "id": 2,
+    "img_name": "/13e8f9c9119f83e5f3ca680dba82d836photo_2023-06-15_11-23-11.jpg",
+    "size": 33722,
+    "type": "image/jpeg",
+    "link": "/download/13e8f9c9119f83e5f3ca680dba82d836photo_2023-06-15_11-23-11.jpg",
+    "user_id": 2
+  },
+  {
+    "id": 3,
+    "img_name": "/5cfcda0ccba84976c4839f0a5dfe0ecdoutput.png",
+    "size": 1293141,
+    "type": "image/png",
+    "link": "/download/5cfcda0ccba84976c4839f0a5dfe0ecdoutput.png",
+    "user_id": 3
+  }
+]

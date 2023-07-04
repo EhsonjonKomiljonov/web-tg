@@ -1,0 +1,18 @@
+[
+  {
+    "id": 1,
+    "user_name": "Ehsonjon",
+    "email": "ekomiljonov@gmail.com",
+    "password": "123456",
+    "isOnline": false,
+    "lastOnline": 1688302566591
+  },
+  {
+    "id": 2,
+    "user_name": "Abdulloh",
+    "email": "abdulloh@gmail.com",
+    "password": "dfgfsdEE33",
+    "isOnline": false,
+    "lastOnline": 1688302566590
+  }
+]

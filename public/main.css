@@ -1,0 +1,108 @@
+html {
+  height: 100%;
+  scroll-behavior: smooth;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  margin: 0;
+}
+
+main {
+  flex-grow: 1;
+}
+
+img {
+  vertical-align: middle;
+  object-fit: cover;
+}
+
+ul,
+ol {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  text-decoration: none;
+}
+
+p {
+  margin: 0;
+}
+
+.users-box::-webkit-scrollbar-track {
+  background-color: #17212b2b;
+  border-radius: 10px;
+}
+
+.users-box::-webkit-scrollbar {
+  width: 10px;
+  background-color: #17212b53;
+}
+
+.users-box::-webkit-scrollbar-thumb {
+  background-color: #17212b;
+}
+
+.users-box {
+  background-color: #17212B;
+  border-right: 1px solid #15406d;
+}
+
+.messages-box::-webkit-scrollbar-track {
+  background-color: #15406d;
+  border-radius: 10px;
+}
+
+.messages-box::-webkit-scrollbar {
+  width: 10px;
+  background-color: #17212b53;
+}
+
+.messages-box::-webkit-scrollbar-thumb {
+  background-color: #3075ba;
+  border-radius: 10px;
+}
+
+.messages-box {
+  height: 100%;
+  background-image: url('bg.webp');
+  background-size: 150% auto;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.send {
+  width: 35px;
+  height: 35px;
+  border: 0;
+  background-image: url('send.png');
+  background-size: contain;
+  border-radius: 50%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 35px;
+}
+
+#msg {
+  width: 100%;
+  display: block;
+  background-color: transparent;
+  border: 0;
+  outline: none;
+  color: #fff;
+}
+
+#msg::placeholder{
+  color: #607883;
+}
